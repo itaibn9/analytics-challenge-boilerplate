@@ -18601,17 +18601,6 @@
       "balance": 75609,
       "createdAt": "2020-10-01T09:13:42.678Z",
       "modifiedAt": "2020-10-29T19:34:28.576Z"
-    },
-    {
-      "id": "fBTHiY-q1",
-      "uuid": "550c89b5-bd85-47d2-8951-8b4554edba29",
-      "firstName": "itai",
-      "lastName": "itay",
-      "username": "Barny",
-      "password": "$2a$10$hoLNuBh13hZqk0HyBPyO7.KZdE93lvsfatf2jHKCPX.F3fA/ALYd6",
-      "balance": 0,
-      "createdAt": "2020-11-01T08:13:28.188Z",
-      "modifiedAt": "2020-11-01T08:13:28.188Z"
     }
   ],
   "contacts": [
@@ -20366,17 +20355,6 @@
       "isDeleted": false,
       "createdAt": "2019-10-31T03:08:47.374Z",
       "modifiedAt": "2020-10-29T06:01:00.266Z"
-    },
-    {
-      "id": "ecz4MfML7",
-      "uuid": "f75fb87f-ac1b-4ea9-8e33-a51100e401c9",
-      "userId": "fBTHiY-q1",
-      "bankName": "pepper",
-      "accountNumber": "1111111111",
-      "routingNumber": "111111111",
-      "isDeleted": false,
-      "createdAt": "2020-11-01T08:14:06.350Z",
-      "modifiedAt": "2020-11-01T08:14:06.350Z"
     }
   ],
   "transactions": [
