@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/suvelocity/analytics-challenge-boilerplate/issues"
   },
-  "homepage": "https://github.com/suvelocity/analytics-challenge-boilerplate#readme"
+  "homepage": "https://github.com/suvelocity/analytics-challenge-boilerplate#readme",
+  "dependencies": {
+    "@types/node": "^14.14.6"
+  }
 }
