@@ -175,7 +175,15 @@ export const removeUserFromResults = (userId: User["id"], results: User[]) =>
   remove({ id: userId }, results);
 
 // convenience methods
-
+// export const getAllUsers = () => db.get(USER_TABLE).value();
+//Event
+export const getAllEvents = (): Event[] => db.get(EVENT_TABLE).value();
+export const getEventById = (id: string) => getEventBy("_id", id);
+export const getEventBy = (key: string, value: string) => getBy(EVENT_TABLE, key, value);
+export const saveEvent = (event: Event): Event => {
+  db.get(EVENT_TABLE).push(event).write();
+  return event;
+};
 // User
 export const getUserBy = (key: string, value: any) => getBy(USER_TABLE, key, value);
 export const getUserId = (user: User): string => user.id;

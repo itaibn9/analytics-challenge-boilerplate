@@ -138,6 +138,8 @@ describe("main test", () => {
   })
 
   it("can post new event", async () => {
+    console.log(mockData.events[0]);
+    
     await request(app).post("/events").send(mockData.events[0]).expect(200);
     const { body: allEvents2 } = await request(app).get("/events/all").expect(200);
     expect(allEvents2.length).toBe(301);

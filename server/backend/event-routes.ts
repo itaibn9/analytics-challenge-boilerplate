@@ -8,13 +8,14 @@ import {
 } from "./database";
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
-
+import { getAllEvents, saveEvent, getEventById } from './database';
 import {
   shortIdValidation,
   searchValidation,
   userFieldsValidator,
   isUserValidator,
 } from "./validators";
+import e from "cors";
 const router = express.Router();
 
 // Routes
@@ -28,7 +29,8 @@ interface Filter {
 }
 
 router.get('/all', (req: Request, res: Response) => {
-  res.send('/all')
+  const allEvents = getAllEvents() 
+  res.send(allEvents);
     
 });
 
@@ -57,11 +59,20 @@ router.get('/retention', (req: Request, res: Response) => {
   res.send('/retention')
 });
 router.get('/:eventId',(req : Request, res : Response) => {
-  res.send('/:eventId')
+  const { eventId } = req.params;
+  console.log(eventId);
+  
+  const event = getEventById(eventId)
+  console.log(event);
+  
+  res.status(200).send(event);
 });
 
 router.post('/', (req: Request, res: Response) => {
-  res.send('/')
+  console.log(req.body);
+  
+  const newEvent = saveEvent(req.body);
+  res.send(newEvent)
 });
 
 router.get('/chart/os/:time',(req: Request, res: Response) => {
