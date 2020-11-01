@@ -1,5 +1,6 @@
 # Analytics Challenge
 
+
 ## Introduction
 
 You will build analytics system that would present usage analytics about a website by collecting events sent to the platform (similar to Mixpanel.com).
