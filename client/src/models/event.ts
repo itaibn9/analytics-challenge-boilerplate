@@ -36,3 +36,10 @@ export interface RetentionCohort {
   search: string;
   offset: number;
 }
+export interface Filter {
+  sorting?: string; // '+date'/'-date'
+  type?: string; 
+  browser?: string;
+  search?: string;
+  offset?: number;
+}

@@ -2,6 +2,7 @@ import path from "path";
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import { v4 } from "uuid";
+import moment from "moment";
 import {
   uniqBy,
   sortedUniqBy,
@@ -20,8 +21,9 @@ import {
   remove,
   countBy,
   groupBy,
+  matches
 } from "lodash/fp";
-import { isWithinInterval } from "date-fns";
+import { getTime, isWithinInterval } from "date-fns";
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import shortid from "shortid";
@@ -49,7 +51,8 @@ import {
   NotificationResponseItem,
   TransactionQueryPayload,
   DefaultPrivacyLevel,
-  Event
+  Event,
+  Filter
 } from "../../client/src/models";
 import Fuse from "fuse.js";
 import {
@@ -69,6 +72,8 @@ import {
   isCommentNotification,
 } from "../../client/src/utils/transactionUtils";
 import { DbSchema } from "../../client/src/models/db-schema";
+import _ from "lodash";
+import {OneHour, OneDay, OneWeek} from "./timeFrames";
 
 
 export type TDatabase = {
@@ -175,7 +180,7 @@ export const removeUserFromResults = (userId: User["id"], results: User[]) =>
   remove({ id: userId }, results);
 
 // convenience methods
-// export const getAllUsers = () => db.get(USER_TABLE).value();
+
 //Event
 export const getAllEvents = (): Event[] => db.get(EVENT_TABLE).value();
 export const getEventById = (id: string) => getEventBy("_id", id);
@@ -184,6 +189,40 @@ export const saveEvent = (event: Event): Event => {
   db.get(EVENT_TABLE).push(event).write();
   return event;
 };
+export const filterEvents = (query: Filter, searchOptions: any) => {
+  console.log(query);
+  console.log(searchOptions);
+  let filtered: any[] = [];
+  filtered = _.filter(db.get(EVENT_TABLE).value(), query);
+  // if(searchOptions.search) filtered = performSearch(filtered, {isCaseSensitive: false,findAllMatches: true,}, searchOptions.search)
+  if(searchOptions.sorting === "+date") filtered = _.orderBy(filtered, "date", "asc")
+  else filtered = _.orderBy(filtered, "date", "desc")
+  const filteredLength: number = filtered.length;
+  if(searchOptions.offset) filtered = _.dropRight(filtered, filtered.length - searchOptions.offset);
+  console.log(filtered.length);
+
+  if(filteredLength > filtered.length) return {events: filtered , more: true}
+  else return {events : filtered, more: false};
+}
+export const CountUniqueSessionsByHours = (offset: number) => {
+  let today:string = new Date().toISOString().slice(0, 10);
+  const startingOfTheDayToCount = moment(today).subtract(offset, "day").valueOf();
+  const allDayEvents: Event[] = db.get(EVENT_TABLE).value().filter((event) => {
+    return event.date >= startingOfTheDayToCount && event.date <= startingOfTheDayToCount + OneDay;
+  })
+  let resultArray: {hour:string,count:number}[] = []; 
+  for (let index = 0; index < 24; index++) {
+    let eventsPerHour = _.filter(allDayEvents, (event) => {
+      return event.date >= startingOfTheDayToCount + (index * OneHour) && event.date <= startingOfTheDayToCount + (index * OneHour + OneHour)
+    })
+    resultArray.push({
+      hour: `${index}:00`,
+      count: eventsPerHour.length,
+    })
+  }
+  
+  return(resultArray);
+}
 // User
 export const getUserBy = (key: string, value: any) => getBy(USER_TABLE, key, value);
 export const getUserId = (user: User): string => user.id;

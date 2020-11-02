@@ -4,11 +4,9 @@ import express from "express";
 import { Request, Response } from "express";
 
 // some useful database functions in here:
-import {
-} from "./database";
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
-import { getAllEvents, saveEvent, getEventById } from './database';
+import { getAllEvents, saveEvent, getEventById, filterEvents, CountUniqueSessionsByHours } from './database';
 import {
   shortIdValidation,
   searchValidation,
@@ -35,7 +33,16 @@ router.get('/all', (req: Request, res: Response) => {
 });
 
 router.get('/all-filtered', (req: Request, res: Response) => {
-  res.send('/all-filtered')
+  console.log(req.body);
+  let updatedQuery: any = {};
+  let searchBy: any = {sorting: "-date"};
+  if(req.body.browser) updatedQuery.browser = req.body.browser;
+  if(req.body.type) updatedQuery.name = req.body.type;
+  if(req.body.sorting === "+date") searchBy.sorting = "+date";
+  if(req.body.search) searchBy.search = req.body.search;
+  if(req.body.offset) searchBy.offset = req.body.offset;
+  const results = filterEvents(updatedQuery, searchBy)
+  res.status(200).send(results);
 });
 
 router.get('/by-days/:offset', (req: Request, res: Response) => {
@@ -43,7 +50,9 @@ router.get('/by-days/:offset', (req: Request, res: Response) => {
 });
 
 router.get('/by-hours/:offset', (req: Request, res: Response) => {
-  res.send('/by-hours/:offset')
+  const offset = req.params.offset;
+  const results = CountUniqueSessionsByHours(+offset);
+  res.send(results)
 });
 
 router.get('/today', (req: Request, res: Response) => {
