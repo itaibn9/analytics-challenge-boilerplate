@@ -1,15 +1,21 @@
-import React from "react";
+import React,{ useEffect, useState } from "react";
 import { Interpreter } from "xstate";
+import { httpClient } from "../utils/asyncUtils";
 import { AuthMachineContext, AuthMachineEvents } from "../machines/authMachine";
 
-export interface Props {
-  authService: Interpreter<AuthMachineContext, any, AuthMachineEvents, any>;
-}
+import GoogleMapChart from "../components/charts/GoogleMapChart";
+import ChartLine from "../components/charts/ChartLine";
+
+
 
 const DashBoard: React.FC = () => {
+
+
   return (
     <>
     <h1>Analytics</h1>
+    <GoogleMapChart />
+    <ChartLine />
     </>
   );
 };

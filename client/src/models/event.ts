@@ -3,7 +3,6 @@ export interface Event {
   session_id: string;
   name: eventName;
   url: string;
-  distinct_user_id: string;
   date: number;
   os: os;
   browser: browser;

@@ -18601,6 +18601,17 @@
       "balance": 75609,
       "createdAt": "2020-10-01T09:13:42.678Z",
       "modifiedAt": "2020-10-29T19:34:28.576Z"
+    },
+    {
+      "id": "CAvWCzFMq",
+      "uuid": "8ebcf403-288b-4a38-989a-7df5574ff59d",
+      "firstName": "itit",
+      "lastName": "itit",
+      "username": "itit",
+      "password": "$2a$10$9ycPCRhTZNO2apOVxKcdh.WuggXMcRSkxs7oODhtsAMEWijabhQl.",
+      "balance": 0,
+      "createdAt": "2020-11-02T18:28:31.887Z",
+      "modifiedAt": "2020-11-02T18:28:31.887Z"
     }
   ],
   "contacts": [
@@ -20355,6 +20366,17 @@
       "isDeleted": false,
       "createdAt": "2019-10-31T03:08:47.374Z",
       "modifiedAt": "2020-10-29T06:01:00.266Z"
+    },
+    {
+      "id": "QMlL5KFYx",
+      "uuid": "3164aa1a-aa87-46f9-a432-f8ae9a288899",
+      "userId": "CAvWCzFMq",
+      "bankName": "pepper",
+      "accountNumber": "1111111111",
+      "routingNumber": "111111111",
+      "isDeleted": false,
+      "createdAt": "2020-11-02T18:29:16.965Z",
+      "modifiedAt": "2020-11-02T18:29:16.965Z"
     }
   ],
   "transactions": [
