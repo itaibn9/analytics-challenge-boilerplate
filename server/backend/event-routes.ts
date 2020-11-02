@@ -6,7 +6,7 @@ import { Request, Response } from "express";
 // some useful database functions in here:
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
-import { getAllEvents, saveEvent, getEventById, filterEvents, CountUniqueSessionsByHours } from './database';
+import { getAllEvents, saveEvent, getEventById, filterEvents, CountUniqueSessionsByHours, CountUniqueSessionsByDays } from './database';
 import {
   shortIdValidation,
   searchValidation,
@@ -46,7 +46,9 @@ router.get('/all-filtered', (req: Request, res: Response) => {
 });
 
 router.get('/by-days/:offset', (req: Request, res: Response) => {
-  res.send('/by-days/:offset')
+  const offset = req.params.offset;
+  const results = CountUniqueSessionsByDays(+offset);
+  res.send(results)
 });
 
 router.get('/by-hours/:offset', (req: Request, res: Response) => {

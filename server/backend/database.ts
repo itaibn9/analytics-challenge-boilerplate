@@ -189,6 +189,7 @@ export const saveEvent = (event: Event): Event => {
   db.get(EVENT_TABLE).push(event).write();
   return event;
 };
+
 export const filterEvents = (query: Filter, searchOptions: any) => {
   console.log(query);
   console.log(searchOptions);
@@ -204,7 +205,8 @@ export const filterEvents = (query: Filter, searchOptions: any) => {
   if(filteredLength > filtered.length) return {events: filtered , more: true}
   else return {events : filtered, more: false};
 }
-export const CountUniqueSessionsByHours = (offset: number) => {
+
+export const CountUniqueSessionsByHours = (offset: number):{hour:string,count:number}[] => {
   let today:string = new Date().toISOString().slice(0, 10);
   const startingOfTheDayToCount = moment(today).subtract(offset, "day").valueOf();
   const allDayEvents: Event[] = db.get(EVENT_TABLE).value().filter((event) => {
@@ -220,8 +222,31 @@ export const CountUniqueSessionsByHours = (offset: number) => {
       count: eventsPerHour.length,
     })
   }
-  
-  return(resultArray);
+  return resultArray;
+}
+
+export const CountUniqueSessionsByDays = (offset: number): {date:string,count:number}[] => {
+  let today :string = new Date().toISOString().slice(0, 10);
+  const startingOfTheDayToCountAsDate = moment(today).subtract(offset + 7, "day")
+  const startingOfTheDayToCountInMiliseconds = moment(today).subtract(offset + 7, "day").valueOf();
+  let allWeekEvents: Event[] = db.get(EVENT_TABLE).value().filter((event) => {
+    return event.date >= startingOfTheDayToCountInMiliseconds && event.date <= startingOfTheDayToCountInMiliseconds + OneWeek;
+  });
+  allWeekEvents = _.uniqBy(allWeekEvents, "session_id");
+  let resultArray: {date:string,count:number}[] = [];
+  for (let index = 0; index < 7; index++) {
+    let eventsPerDay = _.filter(allWeekEvents, (event) => {
+      return event.date >= startingOfTheDayToCountInMiliseconds + (index * OneDay) && event.date <= startingOfTheDayToCountInMiliseconds + (index * OneDay + OneDay)
+    })
+    
+    resultArray.push({
+      date: startingOfTheDayToCountAsDate.add(1, "day").calendar(),
+      count: eventsPerDay.length,
+    })
+    
+  }
+
+  return resultArray
 }
 // User
 export const getUserBy = (key: string, value: any) => getBy(USER_TABLE, key, value);
