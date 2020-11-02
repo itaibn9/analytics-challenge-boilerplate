@@ -186,6 +186,9 @@ export const removeUserFromResults = (userId: User["id"], results: User[]) =>
 export const getAllEvents = (): Event[] => db.get(EVENT_TABLE).value();
 export const getEventById = (id: string) => getEventBy("_id", id);
 export const getEventBy = (key: string, value: string) => getBy(EVENT_TABLE, key, value);
+export const removeDuplicates = (array: Event[]): Event[] => {
+ return array.filter((v,i,a)=>a.findIndex(t =>(t.session_id === v.session_id))===i)
+};
 export const saveEvent = (event: Event): Event => {
   db.get(EVENT_TABLE).push(event).write();
   return event;
@@ -231,11 +234,17 @@ export const CountUniqueSessionsByHours = (offset: number):{hour:string,count:nu
 export const CountUniqueSessionsByDays = (offset: number): {date:string,count:number}[] => {
   let today :string = new Date().toISOString().slice(0, 10);
   const startingOfTheDayToCountAsDate: any = moment(today).subtract(offset + 7, "day")
-  const startingOfTheDayToCountInMiliseconds:number = moment(today).subtract(offset + 7, "day").valueOf();
+  const startingOfTheDayToCountInMiliseconds:number = moment(today).valueOf() - OneWeek;
   let allWeekEvents: Event[] = db.get(EVENT_TABLE).value().filter((event) => {
     return event.date >= startingOfTheDayToCountInMiliseconds && event.date <= startingOfTheDayToCountInMiliseconds + OneWeek;
   });
   allWeekEvents = _.uniqBy(allWeekEvents, "session_id");
+  // const FiteredAllWeekEvents: Event[] = removeDuplicates(allWeekEvents);
+  // console.log(FiteredAllWeekEvents.length);
+  // console.log(allWeekEvents.length);
+  
+  
+
   let resultArray: {date:string,count:number}[] = [];
   for (let index = 0; index < 7; index++) {
     let eventsPerDay = _.filter(allWeekEvents, (event) => {
