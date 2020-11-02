@@ -52,7 +52,8 @@ import {
   TransactionQueryPayload,
   DefaultPrivacyLevel,
   Event,
-  Filter
+  Filter,
+  weeklyRetentionObject
 } from "../../client/src/models";
 import Fuse from "fuse.js";
 import {
@@ -191,16 +192,18 @@ export const saveEvent = (event: Event): Event => {
 };
 
 export const filterEvents = (query: Filter, searchOptions: any) => {
-  console.log(query);
-  console.log(searchOptions);
+ 
+  
   let filtered: any[] = [];
   filtered = _.filter(db.get(EVENT_TABLE).value(), query);
+  console.log(filtered[0]);
   // if(searchOptions.search) filtered = performSearch(filtered, {isCaseSensitive: false,findAllMatches: true,}, searchOptions.search)
   if(searchOptions.sorting === "+date") filtered = _.orderBy(filtered, "date", "asc")
   else filtered = _.orderBy(filtered, "date", "desc")
   const filteredLength: number = filtered.length;
+  console.log(filtered[0]);
+  
   if(searchOptions.offset) filtered = _.dropRight(filtered, filtered.length - searchOptions.offset);
-  console.log(filtered.length);
 
   if(filteredLength > filtered.length) return {events: filtered , more: true}
   else return {events : filtered, more: false};
@@ -227,8 +230,8 @@ export const CountUniqueSessionsByHours = (offset: number):{hour:string,count:nu
 
 export const CountUniqueSessionsByDays = (offset: number): {date:string,count:number}[] => {
   let today :string = new Date().toISOString().slice(0, 10);
-  const startingOfTheDayToCountAsDate = moment(today).subtract(offset + 7, "day")
-  const startingOfTheDayToCountInMiliseconds = moment(today).subtract(offset + 7, "day").valueOf();
+  const startingOfTheDayToCountAsDate: any = moment(today).subtract(offset + 7, "day")
+  const startingOfTheDayToCountInMiliseconds:number = moment(today).subtract(offset + 7, "day").valueOf();
   let allWeekEvents: Event[] = db.get(EVENT_TABLE).value().filter((event) => {
     return event.date >= startingOfTheDayToCountInMiliseconds && event.date <= startingOfTheDayToCountInMiliseconds + OneWeek;
   });
@@ -238,15 +241,60 @@ export const CountUniqueSessionsByDays = (offset: number): {date:string,count:nu
     let eventsPerDay = _.filter(allWeekEvents, (event) => {
       return event.date >= startingOfTheDayToCountInMiliseconds + (index * OneDay) && event.date <= startingOfTheDayToCountInMiliseconds + (index * OneDay + OneDay)
     })
-    
     resultArray.push({
-      date: startingOfTheDayToCountAsDate.add(1, "day").calendar(),
+      date: moment.unix((startingOfTheDayToCountAsDate.add(1, "day"))/1000).format("DD-MM-YYYY"),
       count: eventsPerDay.length,
     })
-    
   }
+  return resultArray;
+}
 
-  return resultArray
+export const getRetentionCohort = (dayZero: number):weeklyRetentionObject[]  => {
+  let today :string = new Date().toISOString().slice(0, 10);
+  let todayInMiliSecon :number = moment(today).valueOf();
+  const calculatePrecent = (numberOfUserSignedUp: number, numberOfUsers: number): number =>{
+  return ((numberOfUserSignedUp/100)*numberOfUsers);
+  }
+  let resultArray: weeklyRetentionObject[] = [];
+  let numberOfWeek: number = 0;
+ for (let begginingWeek = dayZero; begginingWeek < todayInMiliSecon + (OneDay * 6); begginingWeek+=OneWeek) {
+   let UsersSignedUp = db.get(EVENT_TABLE).value().filter((event) => {
+     return event.name === "signup" &&
+      event.date >= begginingWeek &&
+      event.date <= begginingWeek + OneWeek;
+   });
+   const arrayOfUsersId: string[] = [];
+   UsersSignedUp.forEach((user) => arrayOfUsersId.push(user.distinct_user_id));
+   const numberOfUserSignedUp = arrayOfUsersId.length;
+   const weeklyRetentionArray:number[] = [100]
+   for (let week = begginingWeek + OneWeek; week < todayInMiliSecon; week+=OneWeek) {
+     let countUserSComeBack: number = 0;
+     let userInteraction = db.get(EVENT_TABLE).value().filter((event) => {
+       return event.name !== "signup" &&
+        event.date >= begginingWeek &&
+         event.date <= begginingWeek + OneWeek;
+     });
+     arrayOfUsersId.forEach(id =>{
+       if(userInteraction.some(el => el.distinct_user_id === id))
+      { 
+        console.log("Hey");
+        countUserSComeBack++;
+      }
+     })
+     weeklyRetentionArray.push((calculatePrecent(numberOfUserSignedUp, countUserSComeBack))*100);
+   }
+   const weeklyInteraction: weeklyRetentionObject = {
+    registrationWeek: numberOfWeek,
+    newUsers: numberOfUserSignedUp, 
+    weeklyRetention: weeklyRetentionArray, 
+    start: moment.unix(begginingWeek/1000).format("DD-MM-YYYY"),
+    end: moment.unix((begginingWeek+OneWeek)/1000).format("DD-MM-YYYY")
+   }
+
+   numberOfWeek++
+   resultArray.push(weeklyInteraction)
+  }
+  return resultArray;
 }
 // User
 export const getUserBy = (key: string, value: any) => getBy(USER_TABLE, key, value);

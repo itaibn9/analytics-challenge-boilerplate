@@ -6,7 +6,15 @@ import { Request, Response } from "express";
 // some useful database functions in here:
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
-import { getAllEvents, saveEvent, getEventById, filterEvents, CountUniqueSessionsByHours, CountUniqueSessionsByDays } from './database';
+import {
+  getAllEvents,
+  saveEvent,
+  getEventById,
+  filterEvents,
+  CountUniqueSessionsByHours,
+  CountUniqueSessionsByDays,
+  getRetentionCohort
+ } from './database';
 import {
   shortIdValidation,
   searchValidation,
@@ -33,7 +41,6 @@ router.get('/all', (req: Request, res: Response) => {
 });
 
 router.get('/all-filtered', (req: Request, res: Response) => {
-  console.log(req.body);
   let updatedQuery: any = {};
   let searchBy: any = {sorting: "-date"};
   if(req.body.browser) updatedQuery.browser = req.body.browser;
@@ -66,22 +73,17 @@ router.get('/week', (req: Request, res: Response) => {
 });
 
 router.get('/retention', (req: Request, res: Response) => {
-  const {dayZero} = req.query
-  res.send('/retention')
+  const {dayZero} = req.query;
+  const results = getRetentionCohort(+dayZero);
+  res.send(results)
 });
 router.get('/:eventId',(req : Request, res : Response) => {
   const { eventId } = req.params;
-  console.log(eventId);
-  
   const event = getEventById(eventId)
-  console.log(event);
-  
   res.status(200).send(event);
 });
 
 router.post('/', (req: Request, res: Response) => {
-  console.log(req.body);
-  
   const newEvent = saveEvent(req.body);
   res.send(newEvent)
 });
