@@ -1,17 +1,19 @@
 import React,{ useEffect, useState } from 'react'
 import { Event } from "../../models"
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker, MarkerClusterer } from '@react-google-maps/api';
 import { httpClient } from "../../utils/asyncUtils";
 import { Props } from "../../containers/DashBoard"
 require('dotenv').config();
 const API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
-
 const containerStyle = {
     width: '700px',
     height: '300px'
   };
-  
+  const options = {
+    imagePath:
+      'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
+  }
 
 const GoogleMapChart: React.FC<Props> = () => {
   const [allEvents, setAllEvents]: any = useState([]);
@@ -38,10 +40,13 @@ const GoogleMapChart: React.FC<Props> = () => {
         >
           { /* Child components, such as markers, info windows, etc. */ }
           <>
-          {allEvents.map((event: Event) =>
-            <Marker key={event.session_id} position={{ lat: event.geolocation.location.lat, lng: event.geolocation.location.lng}} />
-          )}
-          
+          <MarkerClusterer options={options}>
+          {(clusterer) =>
+          allEvents.map((event: Event) => (
+            <Marker key={event.session_id} position={{ lat: event.geolocation.location.lat, lng: event.geolocation.location.lng}} clusterer={clusterer} />
+          ))
+          }
+          </MarkerClusterer>
           </>
         </GoogleMap>
       </LoadScript>
