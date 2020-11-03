@@ -21,7 +21,8 @@ import {
   remove,
   countBy,
   groupBy,
-  matches
+  matches,
+  sortBy
 } from "lodash/fp";
 import { getTime, isWithinInterval } from "date-fns";
 import low from "lowdb";
@@ -186,38 +187,46 @@ export const removeUserFromResults = (userId: User["id"], results: User[]) =>
 export const getAllEvents = (): Event[] => db.get(EVENT_TABLE).value();
 export const getEventById = (id: string) => getEventBy("_id", id);
 export const getEventBy = (key: string, value: string) => getBy(EVENT_TABLE, key, value);
-export const removeDuplicates = (array: Event[]): Event[] => {
- return array.filter((v,i,a)=>a.findIndex(t =>(t.session_id === v.session_id))===i)
-};
+export const removeDuplicates = (myArr: Event[]) => {
+const result = [];
+const map = new Map();
+for (const item of myArr) {
+    if(!map.has(item.session_id)){
+        map.set(item.session_id, true);    // set any value to Map
+        result.push(item);
+    }
+}
+return result;
+}
+export let today:string = new Date().toISOString().slice(0, 10); 
 export const saveEvent = (event: Event): Event => {
   db.get(EVENT_TABLE).push(event).write();
   return event;
 };
 
 export const filterEvents = (query: Filter, searchOptions: any) => {
- 
-  
   let filtered: any[] = [];
   filtered = _.filter(db.get(EVENT_TABLE).value(), query);
-  console.log(filtered[0]);
-  // if(searchOptions.search) filtered = performSearch(filtered, {isCaseSensitive: false,findAllMatches: true,}, searchOptions.search)
-  if(searchOptions.sorting === "+date") filtered = _.orderBy(filtered, "date", "asc")
-  else filtered = _.orderBy(filtered, "date", "desc")
+  filtered = _.sortBy(filtered, "date");
+  if(searchOptions.search) filtered = _.filter(filtered, (e) => {return e.session_id.includes(searchOptions.search)});
+  if(searchOptions.sorting === "-date"){
+    filtered = filtered.reverse()
+  }
   const filteredLength: number = filtered.length;
-  console.log(filtered[0]);
-  
   if(searchOptions.offset) filtered = _.dropRight(filtered, filtered.length - searchOptions.offset);
-
   if(filteredLength > filtered.length) return {events: filtered , more: true}
   else return {events : filtered, more: false};
 }
 
 export const CountUniqueSessionsByHours = (offset: number):{hour:string,count:number}[] => {
-  let today:string = new Date().toISOString().slice(0, 10);
   const startingOfTheDayToCount = moment(today).subtract(offset, "day").valueOf();
+  // console.log(startingOfTheDayToCount + "-----StartDay");
+  
   const allDayEvents: Event[] = db.get(EVENT_TABLE).value().filter((event) => {
     return event.date >= startingOfTheDayToCount && event.date <= startingOfTheDayToCount + OneDay;
   })
+  // console.log(allDayEvents.length + "----AllEvents");
+  
   let resultArray: {hour:string,count:number}[] = []; 
   for (let index = 0; index < 24; index++) {
     let eventsPerHour = _.filter(allDayEvents, (event) => {
@@ -232,17 +241,17 @@ export const CountUniqueSessionsByHours = (offset: number):{hour:string,count:nu
 }
 
 export const CountUniqueSessionsByDays = (offset: number): {date:string,count:number}[] => {
-  let today :string = new Date().toISOString().slice(0, 10);
-  const startingOfTheDayToCountAsDate: any = moment(today).subtract(offset + 7, "day")
-  const startingOfTheDayToCountInMiliseconds:number = moment(today).valueOf() - OneWeek;
-  let allWeekEvents: Event[] = db.get(EVENT_TABLE).value().filter((event) => {
+  const startingOfTheDayToCountAsDate: any = moment(today).subtract(offset + 7, "day");
+  const startingOfTheDayToCountInMiliseconds:number = moment(startingOfTheDayToCountAsDate).valueOf();
+  let allWeekEvents: Event[] = db.get(EVENT_TABLE).filter((event) => {
     return event.date >= startingOfTheDayToCountInMiliseconds && event.date <= startingOfTheDayToCountInMiliseconds + OneWeek;
-  });
-  allWeekEvents = _.uniqBy(allWeekEvents, "session_id");
-  // const FiteredAllWeekEvents: Event[] = removeDuplicates(allWeekEvents);
-  // console.log(FiteredAllWeekEvents.length);
-  // console.log(allWeekEvents.length);
+  }).value();
+console.log(allWeekEvents.length + "----Before Filter");
+
+  // allWeekEvents = _.uniqBy(allWeekEvents, "session_id");
   
+
+  // console.log(allWeekEventsUniqBy.length + "----After Filter");
   
 
   let resultArray: {date:string,count:number}[] = [];
@@ -250,9 +259,15 @@ export const CountUniqueSessionsByDays = (offset: number): {date:string,count:nu
     let eventsPerDay = _.filter(allWeekEvents, (event) => {
       return event.date >= startingOfTheDayToCountInMiliseconds + (index * OneDay) && event.date <= startingOfTheDayToCountInMiliseconds + (index * OneDay + OneDay)
     })
+    console.log(eventsPerDay.length + "----Per Day");
+    // const perDayEventsUniqBy =  [...Array.from(new Set(eventsPerDay.map(event => event.session_id)))]
+    // const perDayEventsUniqBy = _.uniqBy(allWeekEvents, "session_id");
+    const perDayEventsUniqBy = removeDuplicates(eventsPerDay);
+    console.log(perDayEventsUniqBy.length + "----Per Day Filter");
+    // console.log(blabla.length + "----Per Day Filter");
     resultArray.push({
       date: moment.unix((startingOfTheDayToCountAsDate.add(1, "day"))/1000).format("DD-MM-YYYY"),
-      count: eventsPerDay.length,
+      count: perDayEventsUniqBy.length,
     })
   }
   return resultArray;

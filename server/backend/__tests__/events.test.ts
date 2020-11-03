@@ -121,7 +121,7 @@ describe("main test", () => {
     expect(events.events[0].session_id).toMatch(/100/i)
     expect(events.events[1].session_id).toMatch(/100/i)
   })
-
+  
   it("can sort events by date", async () => {
     const { body: events}  = await request(app).get("/events/all-filtered")
     .query({

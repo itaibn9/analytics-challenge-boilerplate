@@ -2,7 +2,8 @@
 
 import express from "express";
 import { Request, Response } from "express";
-
+const Window = require('window');
+const window = new Window();
 // some useful database functions in here:
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
@@ -43,11 +44,11 @@ router.get('/all', (req: Request, res: Response) => {
 router.get('/all-filtered', (req: Request, res: Response) => {
   let updatedQuery: any = {};
   let searchBy: any = {sorting: "-date"};
-  if(req.body.browser) updatedQuery.browser = req.body.browser;
-  if(req.body.type) updatedQuery.name = req.body.type;
-  if(req.body.sorting === "+date") searchBy.sorting = "+date";
-  if(req.body.search) searchBy.search = req.body.search;
-  if(req.body.offset) searchBy.offset = req.body.offset;
+  if(req.query.browser) updatedQuery.browser = req.query.browser;
+  if(req.query.type) updatedQuery.name = req.query.type;
+  if(req.query.sorting === "+date") searchBy.sorting = "+date";
+  if(req.query.search) searchBy.search = req.query.search;
+  if(req.query.offset) searchBy.offset = req.query.offset;
   const results = filterEvents(updatedQuery, searchBy)
   res.status(200).send(results);
 });
