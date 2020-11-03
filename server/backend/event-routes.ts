@@ -14,7 +14,8 @@ import {
   filterEvents,
   CountUniqueSessionsByHours,
   CountUniqueSessionsByDays,
-  getRetentionCohort
+  getRetentionCohort,
+  getUserById
  } from './database';
 import {
   shortIdValidation,
@@ -43,10 +44,11 @@ router.get('/all', (req: Request, res: Response) => {
 
 router.get('/all-filtered', (req: Request, res: Response) => {
   let updatedQuery: any = {};
-  let searchBy: any = {sorting: "-date"};
+  let searchBy: any = {};
   if(req.query.browser) updatedQuery.browser = req.query.browser;
   if(req.query.type) updatedQuery.name = req.query.type;
   if(req.query.sorting === "+date") searchBy.sorting = "+date";
+  else searchBy.sorting = "-date";
   if(req.query.search) searchBy.search = req.query.search;
   if(req.query.offset) searchBy.offset = req.query.offset;
   const results = filterEvents(updatedQuery, searchBy)
@@ -64,6 +66,12 @@ router.get('/by-hours/:offset', (req: Request, res: Response) => {
   const results = CountUniqueSessionsByHours(+offset);
   res.send(results)
 });
+
+router.get('/find-user/:userId', (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const user = getUserById(userId);
+  res.status(200).send({ user })
+})
 
 router.get('/today', (req: Request, res: Response) => {
   res.send('/today')

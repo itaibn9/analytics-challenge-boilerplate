@@ -4,10 +4,7 @@ import { Event } from "../../models"
 import { httpClient } from "../../utils/asyncUtils";
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-
-type Props = {
-  [key: string]: any;
-};
+import { Props } from "../../containers/DashBoard"
 
 const useStyles = makeStyles((theme) => ({
   container: {

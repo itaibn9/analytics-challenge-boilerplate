@@ -2,10 +2,13 @@ import React,{ useEffect, useState } from "react";
 import { Interpreter } from "xstate";
 import { httpClient } from "../utils/asyncUtils";
 import { AuthMachineContext, AuthMachineEvents } from "../machines/authMachine";
-import SessionByDays from "../components/charts/SessionByDays";
-import GoogleMapChart from "../components/charts/GoogleMapChart";
-import SessionByHour from "../components/charts/SessionByHour";
-
+import SessionByDays from "../components/analytics/SessionByDays";
+import GoogleMapChart from "../components/analytics/GoogleMapChart";
+import SessionByHour from "../components/analytics/SessionByHour";
+import SearchBar from "../components/analytics/SearchBar";
+export type Props = {
+  [key: string]: any;
+};
 
 
 const DashBoard: React.FC = () => {
@@ -17,6 +20,7 @@ const DashBoard: React.FC = () => {
     <GoogleMapChart />
     <SessionByHour />
     <SessionByDays />
+    <SearchBar />
     </>
   );
 };

@@ -2,18 +2,11 @@ import React,{ useEffect, useState } from 'react'
 import { Event } from "../../models"
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { httpClient } from "../../utils/asyncUtils";
+import { Props } from "../../containers/DashBoard"
 require('dotenv').config();
-declare global {
-    interface Window {
-        google:any;
-    }
-}
-let google = window.google;
 const API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
-type Props = {
-    [key: string]: any;
-};
+
 const containerStyle = {
     width: '700px',
     height: '300px'
