@@ -15,7 +15,7 @@ import {
   CountUniqueSessionsByHours,
   CountUniqueSessionsByDays,
   getRetentionCohort,
-  getUserById
+  getUserById,
  } from './database';
 import {
   shortIdValidation,
@@ -42,6 +42,7 @@ router.get('/all', (req: Request, res: Response) => {
     
 });
 
+
 router.get('/all-filtered', (req: Request, res: Response) => {
   let updatedQuery: any = {};
   let searchBy: any = {};
@@ -62,8 +63,7 @@ router.get('/by-days/:offset', (req: Request, res: Response) => {
 });
 
 router.get('/by-hours/:offset', (req: Request, res: Response) => {
-  const offset = req.params.offset;
-  const results = CountUniqueSessionsByHours(+offset);
+  const results = CountUniqueSessionsByHours(+req.params.offset);
   res.send(results)
 });
 

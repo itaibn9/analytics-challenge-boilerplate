@@ -77,7 +77,6 @@ import { DbSchema } from "../../client/src/models/db-schema";
 import _ from "lodash";
 import {OneHour, OneDay, OneWeek} from "./timeFrames";
 
-
 export type TDatabase = {
   users: User[];
   contacts: Contact[];
@@ -89,6 +88,11 @@ export type TDatabase = {
   banktransfers: BankTransfer[];
   events: Event[];
 };
+interface countedDay {
+  date: string;
+  count: number;
+}
+
 
 const USER_TABLE = "users";
 const CONTACT_TABLE = "contacts";
@@ -181,24 +185,30 @@ export const searchUsers = (query: string) => {
 export const removeUserFromResults = (userId: User["id"], results: User[]) =>
   remove({ id: userId }, results);
 
-// convenience methods
-
-//Event
+  
+  //Event
+  // convenience methods
 export const getAllEvents = (): Event[] => db.get(EVENT_TABLE).value();
 export const getEventById = (id: string) => getEventBy("_id", id);
 export const getEventBy = (key: string, value: string) => getBy(EVENT_TABLE, key, value);
-export const removeDuplicates = (myArr: Event[]) => {
-const result = [];
-const map = new Map();
-for (const item of myArr) {
-    if(!map.has(item.session_id)){
-        map.set(item.session_id, true);    // set any value to Map
-        result.push(item);
-    }
-}
-return result;
-}
 export let today:string = new Date().toISOString().slice(0, 10); 
+export const removeDuplicate = (events: Event[]): string[] => {
+  // return events.filter((e, position, self) => {
+  //   return self.findIndex((ev) => ev[attr] === e[attr]) === position;
+  // });
+  const resultArr :string[] = [];
+  for(let i =0; i < events.length; i++){
+    if(!resultArr.includes(events[i].session_id)) resultArr.push(events[i].session_id);
+  }
+  console.log(resultArr.length + "-----" + events.length);
+  
+  return resultArr;
+};
+export const calculatePrecent = (numberOfUserSignedUp: number, numberOfUsers: number): number =>{
+  console.log(numberOfUserSignedUp + "------" + numberOfUsers);
+  const result = Math.round((numberOfUsers/numberOfUserSignedUp)*100);
+  return result
+  }
 export const saveEvent = (event: Event): Event => {
   db.get(EVENT_TABLE).push(event).write();
   return event;
@@ -220,13 +230,9 @@ export const filterEvents = (query: Filter, searchOptions: any) => {
 
 export const CountUniqueSessionsByHours = (offset: number):{hour:string,count:number}[] => {
   const startingOfTheDayToCount = moment(today).subtract(offset, "day").valueOf();
-  // console.log(startingOfTheDayToCount + "-----StartDay");
-  
   const allDayEvents: Event[] = db.get(EVENT_TABLE).value().filter((event) => {
     return event.date >= startingOfTheDayToCount && event.date <= startingOfTheDayToCount + OneDay;
   })
-  // console.log(allDayEvents.length + "----AllEvents");
-  
   let resultArray: {hour:string,count:number}[] = []; 
   for (let index = 0; index < 24; index++) {
     let eventsPerHour = _.filter(allDayEvents, (event) => {
@@ -241,71 +247,81 @@ export const CountUniqueSessionsByHours = (offset: number):{hour:string,count:nu
 }
 
 export const CountUniqueSessionsByDays = (offset: number): {date:string,count:number}[] => {
-  const startingOfTheDayToCountAsDate: any = moment(today).subtract(offset + 7, "day");
-  const startingOfTheDayToCountInMiliseconds:number = moment(startingOfTheDayToCountAsDate).valueOf();
+  let startingOfTheDayToCountInMiliseconds: any = moment().subtract(offset + 6, "day").valueOf();
   let allWeekEvents: Event[] = db.get(EVENT_TABLE).filter((event) => {
-    return event.date >= startingOfTheDayToCountInMiliseconds && event.date <= startingOfTheDayToCountInMiliseconds + OneWeek;
-  }).value();
-console.log(allWeekEvents.length + "----Before Filter");
-
-  // allWeekEvents = _.uniqBy(allWeekEvents, "session_id");
-  
-
-  // console.log(allWeekEventsUniqBy.length + "----After Filter");
-  
+    return event.date >= startingOfTheDayToCountInMiliseconds && event.date <= startingOfTheDayToCountInMiliseconds + OneWeek + OneDay;
+  }).value(); // get all the events in that week including the same day
 
   let resultArray: {date:string,count:number}[] = [];
   for (let index = 0; index < 7; index++) {
     let eventsPerDay = _.filter(allWeekEvents, (event) => {
-      return event.date >= startingOfTheDayToCountInMiliseconds + (index * OneDay) && event.date <= startingOfTheDayToCountInMiliseconds + (index * OneDay + OneDay)
+      return (event.date >= startingOfTheDayToCountInMiliseconds && event.date <= (startingOfTheDayToCountInMiliseconds + OneDay))
     })
-    console.log(eventsPerDay.length + "----Per Day");
-    // const perDayEventsUniqBy =  [...Array.from(new Set(eventsPerDay.map(event => event.session_id)))]
-    // const perDayEventsUniqBy = _.uniqBy(allWeekEvents, "session_id");
-    const perDayEventsUniqBy = removeDuplicates(eventsPerDay);
-    console.log(perDayEventsUniqBy.length + "----Per Day Filter");
-    // console.log(blabla.length + "----Per Day Filter");
+    const perDayEventsUniqBy = removeDuplicate(eventsPerDay);
     resultArray.push({
-      date: moment.unix((startingOfTheDayToCountAsDate.add(1, "day"))/1000).format("DD-MM-YYYY"),
+      date: moment.unix(startingOfTheDayToCountInMiliseconds/1000).format("DD-MM-YYYY"),
       count: perDayEventsUniqBy.length,
     })
+    startingOfTheDayToCountInMiliseconds += OneDay;
   }
   return resultArray;
 }
 
 export const getRetentionCohort = (dayZero: number):weeklyRetentionObject[]  => {
-  let today :string = new Date().toISOString().slice(0, 10);
-  let todayInMiliSecon :number = moment(today).valueOf();
-  const calculatePrecent = (numberOfUserSignedUp: number, numberOfUsers: number): number =>{
-  return ((numberOfUserSignedUp/100)*numberOfUsers);
-  }
   let resultArray: weeklyRetentionObject[] = [];
   let numberOfWeek: number = 0;
- for (let begginingWeek = dayZero; begginingWeek < todayInMiliSecon + (OneDay * 6); begginingWeek+=OneWeek) {
-   let UsersSignedUp = db.get(EVENT_TABLE).value().filter((event) => {
-     return event.name === "signup" &&
-      event.date >= begginingWeek &&
-      event.date <= begginingWeek + OneWeek;
-   });
+  const allSignups:Event[] = db
+  .get(EVENT_TABLE)
+  .value()
+  .filter((event: Event) => event.name === "signup")
+  const allLogins : Event[] = db
+  .get(EVENT_TABLE)
+  .value()
+  .filter((event: Event) => event.name === "login")
+  
+ for (let begginingWeek = dayZero; begginingWeek <= Date.now(); begginingWeek += OneWeek) {
+  //  let UsersSignedUp = db.get(EVENT_TABLE).value().filter((event) => {
+  //    return event.name === "signup" &&
+  //     event.date >= begginingWeek &&
+  //     event.date <= begginingWeek + OneWeek;
+  //  });
+
+  // All Signedup for this week
+  let usersSignedUp = allSignups.filter(
+    (event: Event) => 
+    event.date >= begginingWeek &&
+     event.date <= begginingWeek + OneWeek);
+
    const arrayOfUsersId: string[] = [];
-   UsersSignedUp.forEach((user) => arrayOfUsersId.push(user.distinct_user_id));
-   const numberOfUserSignedUp = arrayOfUsersId.length;
-   const weeklyRetentionArray:number[] = [100]
-   for (let week = begginingWeek + OneWeek; week < todayInMiliSecon; week+=OneWeek) {
-     let countUserSComeBack: number = 0;
-     let userInteraction = db.get(EVENT_TABLE).value().filter((event) => {
-       return event.name !== "signup" &&
-        event.date >= begginingWeek &&
-         event.date <= begginingWeek + OneWeek;
-     });
-     arrayOfUsersId.forEach(id =>{
-       if(userInteraction.some(el => el.distinct_user_id === id))
+   const numberOfUserSignedUp = usersSignedUp.length;
+   usersSignedUp.forEach((user) => arrayOfUsersId.push(user.distinct_user_id));
+   const weeklyRetentionArray:number[] = []
+   if(numberOfUserSignedUp !== 0){
+    weeklyRetentionArray.push(100);
+   } else {
+    weeklyRetentionArray.push(0);
+   }
+   for (let week = begginingWeek + OneWeek; week <= Date.now(); week+=OneWeek) {
+     //  let userInteraction = db.get(EVENT_TABLE).value().filter((event) => {
+       //    return event.name === "login" &&
+       //     event.date >= week &&
+       //      event.date <= week + OneWeek;
+       //  });
+    let countUserSComeBack: number = 0;
+    let userInteraction: Event[] = allLogins.filter(
+      (event: Event) => 
+      event.date >= week &&
+       event.date <= week + OneWeek);
+
+    arrayOfUsersId.forEach(id =>{
+      if(userInteraction.some(user => user.distinct_user_id === id))
       { 
-        console.log("Hey");
         countUserSComeBack++;
       }
      })
-     weeklyRetentionArray.push((calculatePrecent(numberOfUserSignedUp, countUserSComeBack))*100);
+     console.log(countUserSComeBack/numberOfUserSignedUp);
+     
+     weeklyRetentionArray.push(isNaN(countUserSComeBack/numberOfUserSignedUp) ? 0 : Math.round(100*countUserSComeBack/numberOfUserSignedUp));
    }
    const weeklyInteraction: weeklyRetentionObject = {
     registrationWeek: numberOfWeek,
