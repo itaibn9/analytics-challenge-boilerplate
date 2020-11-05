@@ -247,23 +247,25 @@ export const CountUniqueSessionsByHours = (offset: number):{hour:string,count:nu
 }
 
 export const CountUniqueSessionsByDays = (offset: number): {date:string,count:number}[] => {
-  let startingOfTheDayToCountInMiliseconds: any = moment().subtract(offset + 6, "day").valueOf();
+  let startDay: number = moment().startOf("day").subtract(offset, "day").subtract(6, "day").valueOf();
+  let endDay: number = moment(startDay).add(1, "week").endOf("day").valueOf();
   let allWeekEvents: Event[] = db.get(EVENT_TABLE).filter((event) => {
-    return event.date >= startingOfTheDayToCountInMiliseconds && event.date <= startingOfTheDayToCountInMiliseconds + OneWeek + OneDay;
+    return event.date >= startDay && event.date <= endDay;
   }).value(); // get all the events in that week including the same day
 
   let resultArray: {date:string,count:number}[] = [];
   for (let index = 0; index < 7; index++) {
-    let eventsPerDay = _.filter(allWeekEvents, (event) => {
-      return (event.date >= startingOfTheDayToCountInMiliseconds && event.date <= (startingOfTheDayToCountInMiliseconds + OneDay))
+    let eventsPerDay = allWeekEvents.filter((event) => {
+      return event.date >= moment(startDay).add(index, "day").valueOf() && event.date <= moment(startDay).add(index + 1, "day").valueOf()
     })
     const perDayEventsUniqBy = removeDuplicate(eventsPerDay);
+    
     resultArray.push({
-      date: moment.unix(startingOfTheDayToCountInMiliseconds/1000).format("DD-MM-YYYY"),
-      count: perDayEventsUniqBy.length,
+      date: moment(startDay).add(index, "day").format("DD-MM-YYYY"),
+      count: eventsPerDay.length 
     })
-    startingOfTheDayToCountInMiliseconds += OneDay;
   }
+  console.log(resultArray);
   return resultArray;
 }
 
@@ -278,8 +280,9 @@ export const getRetentionCohort = (dayZero: number):weeklyRetentionObject[]  => 
   .get(EVENT_TABLE)
   .value()
   .filter((event: Event) => event.name === "login")
+  const startWeek = moment(dayZero).startOf("day").valueOf();
   
- for (let begginingWeek = dayZero; begginingWeek <= Date.now(); begginingWeek += OneWeek) {
+ for (let begginingWeek = startWeek; begginingWeek <= Date.now(); begginingWeek += OneWeek) {
   //  let UsersSignedUp = db.get(EVENT_TABLE).value().filter((event) => {
   //    return event.name === "signup" &&
   //     event.date >= begginingWeek &&

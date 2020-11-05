@@ -82,7 +82,7 @@ const DashBoard: React.FC = () => {
           </ErrorBoundary>
           {/* <div className="container" style={{gridArea: "retentionChart"}}> */}
           <Grid item>
-          <Grid container direction="row" justify="space-between" >
+          <Grid container direction="row" justify="flex-start" >
           <Grid item>
           <ErrorBoundary>
           <SessionByDays chartSize={chartSize}/>
@@ -109,7 +109,7 @@ const DashBoard: React.FC = () => {
           </ErrorBoundary>
           <ErrorBoundary>
           {/* <div className="container" style={{gridArea: "searchChart"}}> */}
-          <Grid item>
+          <Grid item >
           <SearchBar/>
         {/* </div> */}
         </Grid>

@@ -55,7 +55,6 @@ getEventsByHour();
       <form className={classes.container} noValidate>
       <TextField
         id="date"
-        label="Date To Search"
         type="date"
         defaultValue={new Date().toISOString().slice(0, 10)}
         className={classes.textField}
