@@ -5,18 +5,9 @@ import { httpClient } from "../../utils/asyncUtils";
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { Props } from "../../containers/DashBoard"
+import "./RetentionChart.css";
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  textField: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    width: 200,
-  },
-}));
+
 
 
 export const getNumberOfDaysFromToday = (date: any = new Date()): number => {
@@ -27,8 +18,18 @@ export const getNumberOfDaysFromToday = (date: any = new Date()): number => {
  return Difference_In_Days;
 }
 
-const SessionByHour: React.FC<Props> = () => {
-  const classes = useStyles();
+const SessionByHour: React.FC<Props> = ({chartSize}) => {
+  const useStyles = makeStyles((theme) => ({
+    container: {
+      width: chartSize.width,
+    },
+    textField: {
+      marginLeft: theme.spacing(1),
+      marginRight: theme.spacing(1),
+      width: 200,
+    },
+  }));
+const classes = useStyles();
 const [eventByHour, setEventByHour]: any = useState([]);
 const [inputDate, setInputDate]: any = useState(new Date());
 
@@ -49,6 +50,8 @@ getEventsByHour();
 
     return (
       <div className="lineChart">
+        <div className="byHour_header">
+        <h3>Number of events per day by hour</h3>
       <form className={classes.container} noValidate>
       <TextField
         id="date"
@@ -62,7 +65,8 @@ getEventsByHour();
         onChange={(e) => setInputDate(e.target.value)}
       />
     </form>
-    <LineChart width={730} height={250} data={eventByHour}
+    </div>
+    <LineChart width={chartSize.width} height={chartSize.height} data={eventByHour}
     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
     <CartesianGrid strokeDasharray="3 3" />
     <XAxis dataKey="hour" />

@@ -5,21 +5,22 @@ import { httpClient } from "../../utils/asyncUtils";
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { getNumberOfDaysFromToday } from "./SessionByHour";
-import { Props } from "../../containers/DashBoard"
+import { Props } from "../../containers/DashBoard";
+import "./RetentionChart.css";
 
-const useStyles = makeStyles((theme) => ({
+
+
+const SessionByDays: React.FC<Props> = ({chartSize}) => {
+  const useStyles = makeStyles((theme) => ({
     container: {
-      display: 'flex',
-      flexWrap: 'wrap',
+      width: chartSize.width,
     },
     textField: {
       marginLeft: theme.spacing(1),
       marginRight: theme.spacing(1),
-      width: 200,
+      width: 200
     },
   }));
-
-const SessionByDays: React.FC<Props> = () => {
     const classes = useStyles();
     const [eventByDays, setEventByDays]: any = useState([]);
     const [inputDate, setInputDate]: any = useState(new Date());
@@ -40,10 +41,11 @@ const SessionByDays: React.FC<Props> = () => {
       
     return (
         <div className="byDayChart">
+          <div className="byDay_header">
+          <h3>Number of events per week by day</h3>
       <form className={classes.container} noValidate>
       <TextField
         id="date"
-        label="Date To Search"
         type="date"
         defaultValue={new Date().toISOString().slice(0, 10)}
         className={classes.textField}
@@ -53,7 +55,8 @@ const SessionByDays: React.FC<Props> = () => {
         onChange={(e) => setInputDate(e.target.value)}
       />
     </form>
-    <LineChart width={730} height={250} data={eventByDays}
+    </div>
+    <LineChart width={chartSize.width} height={chartSize.height} data={eventByDays}
     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
     <CartesianGrid strokeDasharray="3 3" />
     <XAxis dataKey="date" />

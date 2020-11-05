@@ -6,16 +6,13 @@ import { Props } from "../../containers/DashBoard"
 require('dotenv').config();
 const API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
-const containerStyle = {
-    width: '700px',
-    height: '300px'
-  };
+
   const options = {
     imagePath:
       'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
   }
 
-const GoogleMapChart: React.FC<Props> = () => {
+const GoogleMapChart: React.FC<Props> = ({mapSize}) => {
   const [allEvents, setAllEvents]: any = useState([]);
   const getAllEvents = async (): Promise<Event[] | string | undefined> => {
     try {
@@ -30,11 +27,13 @@ const GoogleMapChart: React.FC<Props> = () => {
     }, [])
 
     return (
+      <div>
+        <h3>Events locations</h3>
         <LoadScript
         googleMapsApiKey={API_KEY}
       >
         <GoogleMap
-          mapContainerStyle={containerStyle}
+          mapContainerStyle={mapSize}
           center={{ lat: 31.5, lng: 34.5}}
           zoom={1}
         >
@@ -50,6 +49,7 @@ const GoogleMapChart: React.FC<Props> = () => {
           </>
         </GoogleMap>
       </LoadScript>
+      </div>
     )
 }
 

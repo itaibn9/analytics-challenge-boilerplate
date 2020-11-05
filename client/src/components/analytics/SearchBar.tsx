@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import AnalyticsBySearch from "./AnalyticsBySearch";
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, Grid } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import { Props } from "../../containers/DashBoard";
+import "./RetentionChart.css";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -49,12 +50,13 @@ const SearchBar: React.FC<Props> = () => {
     }
 
     return (
-        <div className="Search_Container">
-            <div className="Search_Inputs_container">
+      <>
+        <h3>Search events by filters</h3>
+      <Grid container direction="row" justify="space-between" alignItems="stretch">
+          <Grid item className="Search_Inputs_container">
         <form className={classes.root} noValidate autoComplete="off">
       <TextField id="outlined-basic" label="Search" variant="outlined" onChange={(e: any) => {
         setSearch(e.target.value)
-        // setFormOfSearchInputs()
         }} />
     </form>
     <FormControl className={classes.formControl}>
@@ -67,7 +69,6 @@ const SearchBar: React.FC<Props> = () => {
           value={sort}
           onChange={(e : any) => {
             setSort(e.target.value)
-            // setFormOfSearchInputs()
           }}
           displayEmpty
           className={classes.selectEmpty}
@@ -86,7 +87,6 @@ const SearchBar: React.FC<Props> = () => {
           value={type}
           onChange={(e : any) => {
             setType(e.target.value)
-            // setFormOfSearchInputs()
           }}
           displayEmpty
           className={classes.selectEmpty}
@@ -109,7 +109,6 @@ const SearchBar: React.FC<Props> = () => {
           value={browser}
           onChange={(e : any) => {
             setBrowser(e.target.value)
-            // setFormOfSearchInputs()
           }}
           className={classes.selectEmpty}
           displayEmpty
@@ -124,9 +123,12 @@ const SearchBar: React.FC<Props> = () => {
         </Select>
       </FormControl>
       <button onClick={setFormOfSearchInputs}>Search</button>
-    </div>
+    </Grid>
+    <Grid item>
     <AnalyticsBySearch allSearchProps={allSearchProps} />
-        </div>
+    </Grid>
+  </Grid>
+  </>
     )
 }
 

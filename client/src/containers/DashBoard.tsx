@@ -5,81 +5,120 @@ import SessionByHour from "../components/analytics/SessionByHour";
 import SearchBar from "../components/analytics/SearchBar";
 import RetentionChorot from "../components/analytics/RetentionChorot";
 import ErrorBoundary from "./ErrorBoundary";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
+import { Paper, Typography } from '@material-ui/core';
+import "../components/analytics/RetentionChart.css";
+import Box from '@material-ui/core/Box';
 
 export type Props = {
   [key: string]: any;
 };
-const useStyles = makeStyles((theme) => ({
-  dashboard: {
-    flexGrow: 1,
-    gap: "20px",
-    marginTop: "20px",
-    maxWidth: "95vw",
-    marginLeft: "auto",
-    marginRight: "auto",
-  },
-  tile: {
-    display: "flex",
-    flexDirection: "column",
-    boxShadow: "0.5px 0px 0.5px 2px black",
-    height: "43vh",
-    minWidth: "300px",
-    minHeight: "250px",
-    padding: "0px",
+const useStyles = makeStyles((theme: Theme) => ({
+  grid: {
+    display: "grid",
+    gridGap: "40px",
+    textAlign: "center",
     alignContent: "center",
-  },
-  GeoTile: {
-    display: "flex",
-    boxShadow: "0.5px 0px 0.5px 2px black",
-    height: "70vh",
-    minWidth: "90vw",
-    minHeight: "250px",
-    padding: "0px",
-  },
-  "MuiGrid-item": {
+    justifyContent: "center",
     padding: "10px",
+    height: "inherit",
+    width: "inherit",
+    gridTemplate: `
+    'header header' 
+    'Map byDayChart'  
+    'retentionChart retentionChart' 
+    'searchChart byHourChart' `  
   },
+  main: {
+    marginTop: "4rem",
+    display: "grid",
+    padding: "10px",
+    alignContent: "center",
+    justifyItems: "center",
+    alignItems: "center",
+    gridTemplateColumns: "auto",
+    width: "100%",
+  },
+  paper: {
+    minHeight: "90vh",
+    padding: theme.spacing(2),
+    display: "flex",
+    overflow: "auto",
+    flexDirection: "column",
+  }
 }));
-
+const mapSize = {
+  width: '800px',
+  height: '300px',
+  marginLeft: '50px'
+};
+const chartSize = {
+  width: 400,
+  height: 250
+}
 
 const DashBoard: React.FC = () => {
   const classes = useStyles();
 
   return (
-    <>
-    <h1>Analytics</h1>
+    <Paper id="wrapper">
+      <Typography style={{marginLeft: "20px", marginTop: "20px"}} component="h2" variant="h6" color="primary" gutterBottom>
+      Analytics
+    </Typography>
+       <Grid container direction="column" justify="space-between" alignItems="center">
+      <div className={classes.grid}>
+      <Grid item>
+    </Grid>
     <ErrorBoundary>
-        <Grid container justify={"center"} spacing={10} className={classes.dashboard}>
+        <div>
           <ErrorBoundary>
-            <Grid item className={classes.GeoTile} xs={10}>
-            <GoogleMapChart />
-            </Grid>
+          {/* <div className="container" style={{gridArea: "Map"}}> */}
+          <Grid item style={{marginTop:"100px", marginRight:"250px"}}>
+         <GoogleMapChart mapSize={mapSize}/>
+        {/* </div> */}
+        </Grid>
           </ErrorBoundary>
+          {/* <div className="container" style={{gridArea: "retentionChart"}}> */}
+          <Grid item>
+          <Grid container direction="row" justify="space-between" >
+          <Grid item>
           <ErrorBoundary>
-            <Grid item className={classes.tile} xs={5}>
-            <SessionByDays />
-            </Grid>
-          </ErrorBoundary>
-          <ErrorBoundary>
-            <Grid item className={classes.tile} xs={6}>
-            <SessionByHour />
-            </Grid>
-          </ErrorBoundary>
-          <ErrorBoundary>
-            <Grid item className={classes.GeoTile} xs={7}>
-            <RetentionChorot />
-            </Grid>
-          </ErrorBoundary>
-          <ErrorBoundary>
-            <Grid item className={classes.tile} xs={7}>
-            <SearchBar/>
-            </Grid>
+          <SessionByDays chartSize={chartSize}/>
+          
+        {/* </div> */}
           </ErrorBoundary>
           </Grid>
+          <Grid item>
+          <ErrorBoundary>
+          {/* <div className="container" style={{gridArea: "byDayChart"}}> */}
+          
+            <SessionByHour chartSize={chartSize}/>
+            {/* </div> */}
+        {/* </div> */}
+        </ErrorBoundary>
+        </Grid>
+        </Grid>
+            </Grid>
+        <ErrorBoundary>
+            {/* <div className="container" style={{gridArea: "byHourChart"}}> */}
+            <Grid item>
+          <RetentionChorot />
+          </Grid>
+          </ErrorBoundary>
+          <ErrorBoundary>
+          {/* <div className="container" style={{gridArea: "searchChart"}}> */}
+          <Grid item>
+          <SearchBar/>
+        {/* </div> */}
+        </Grid>
+        </ErrorBoundary>
+          </div>
       </ErrorBoundary>
-    </>
+    </div>
+    </Grid>
+    </Paper>
   );
 };
 

@@ -1,7 +1,7 @@
 .table-container{
     height:100%;
-    width:70%;
-    background-color: rgb(200, 196, 196);
+    width:100px;
+    background-color:white;
     overflow: scroll;
     margin:20px;
     padding:20px auto;
@@ -11,8 +11,35 @@
     border:1px solid black;
 }
 tr:hover{
-    background-color: yellow;
+    background-color: rgb(212, 209, 209);
 }
 td:hover, th:hover{
-    background-color: blue;
+    background-color: rgb(185, 185, 245);
 }
+.lineChart{
+    height:100%;
+    width:100%;
+}
+
+  #wrapper{
+    display: flex;
+    width: 100%;
+  }
+  .container {
+    width: fit-content; 
+    /* To adjust the height as well */ 
+    height: fit-content;
+  }
+  .Search_Container{
+      display: flex;
+      flex-direction: row;
+      justify-self: stretch;
+  }
+  .Search_Inputs_container{
+      display: flex;
+      flex-direction: column;
+  }
+  .byDay_header, .byHour_header{
+      display: flex;
+      flex-direction: column;
+  }

@@ -26,7 +26,7 @@ const RetentionChart: React.FC<Props> = ({dayZero}) => {
     const options = {number:4}
 
     return (
-        <div className="table-container">
+        <div className="table-container" style={{width: '70%'}}>
   <Table responsive="sm" striped hover>
     <thead>
       <tr>

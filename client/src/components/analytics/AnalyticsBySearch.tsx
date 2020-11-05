@@ -42,7 +42,7 @@ const AnalyticsBySearch: React.FC<Props> = ({allSearchProps}) => {
     }, [allSearchProps])
 
     return (
-        <div id="scrollableDiv" >
+        <div id="scrollableDiv" style={{width: 500}}>
           {searchData ? (
               <InfiniteScroll 
               dataLength={100} //This is important field to render the next data
@@ -56,10 +56,6 @@ const AnalyticsBySearch: React.FC<Props> = ({allSearchProps}) => {
                   </p>
                 }
                 scrollableTarget="scrollableDiv"
-                style={{
-                    height: '100%',
-                    overflow: 'visible'
-                }}
               > 
               {searchData.map((event: Event) =>
             <SearchResultTicket key={event._id}
