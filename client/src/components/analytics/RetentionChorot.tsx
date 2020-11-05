@@ -1,40 +1,43 @@
 import React, { useEffect, useState } from 'react'
-import { httpClient } from "../../utils/asyncUtils";
-import { Event, weeklyRetentionObject } from "../../models"
 import RetentionChart from "./RetentionChart";
+import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
 
-// http://localhost:3001/events/retention?dayZero=1600511416326
-// {
-//     "registrationWeek": 6,
-//     "newUsers": 0,
-//     "weeklyRetention": [
-//         100
-//     ],
-//     "start": "31-10-2020",
-//     "end": "07-11-2020"
-// }
+const useStyles = makeStyles((theme) => ({
+    container: {
+      display: 'flex',
+      flexWrap: 'wrap',
+    },
+    textField: {
+      marginLeft: theme.spacing(1),
+      marginRight: theme.spacing(1),
+      width: 200,
+    },
+  }));
 const RetentionChorot: React.FC = () => {
-    const [retentionData, setRetentionData] = useState([]);
-
-    const fetchRetentionData = async ():  Promise<weeklyRetentionObject[] | string | undefined> => {
-        try {
-            const { data } = await httpClient.get
-            (`http://localhost:3001/events/retention?dayZero=1601511416326`);
-            console.log(data);
-            setRetentionData(data);
-        } catch (error) {
-            return error.message;
-        }
+    const classes = useStyles();
+    const [inputDate, setInputDate] = useState(1600511416326)
+    
+    const changeRetentionData = (date: string) => {
+        setInputDate(new Date(date).getTime());
     }
 
-    useEffect(() => {
-        fetchRetentionData()
-    }, [])
     return (
-        <div>
-          {retentionData.map((week: weeklyRetentionObject)  => 
-            <RetentionChart key={week.start} weekData={week}/>
-            )}
+        <div className="retention-cohort">
+                  <form className={classes.container} noValidate>
+      <TextField
+        id="date"
+        label="Date To Search"
+        type="date"
+        defaultValue={new Date().toISOString().slice(0, 10)}
+        className={classes.textField}
+        InputLabelProps={{
+          shrink: true,
+        }}
+        onChange={(e) => changeRetentionData(e.target.value)}
+      />
+    </form>
+            <RetentionChart dayZero={inputDate}/>
         </div>
     )
 }

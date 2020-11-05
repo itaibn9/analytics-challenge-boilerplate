@@ -1,0 +1,18 @@
+.table-container{
+    height:100%;
+    width:70%;
+    background-color: rgb(200, 196, 196);
+    overflow: scroll;
+    margin:20px;
+    padding:20px auto;
+  }
+  th,td,tr{
+    text-align:center !important;
+    border:1px solid black;
+}
+tr:hover{
+    background-color: yellow;
+}
+td:hover, th:hover{
+    background-color: blue;
+}
