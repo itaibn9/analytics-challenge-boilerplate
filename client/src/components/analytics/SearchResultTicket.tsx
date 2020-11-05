@@ -39,7 +39,7 @@ const SearchResultTicket: React.FC<Props> = ({ userId, eventName, url, date, os,
           <Typography className={classes.heading}>User {userId} {userFullName}</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
+          <Typography style={{textAlign: "start"}}>
               <b>Event name:</b> {eventName}<br></br>
                <b>url:</b> {url}<br></br>
               <b>date:</b> {moment.unix(date/1000).format("DD-MM-YYYY hh:mm:ss")}<br></br>
