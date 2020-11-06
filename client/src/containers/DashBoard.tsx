@@ -6,11 +6,9 @@ import SearchBar from "../components/analytics/SearchBar";
 import RetentionChorot from "../components/analytics/RetentionChorot";
 import ErrorBoundary from "./ErrorBoundary";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
 import { Paper, Typography } from '@material-ui/core';
 import "../components/analytics/RetentionChart.css";
-import Box from '@material-ui/core/Box';
 
 export type Props = {
   [key: string]: any;

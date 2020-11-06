@@ -1,4 +1,6 @@
-import React,{ useEffect, useState } from 'react'
+import React,{ useEffect, useState } from 'react';
+import CircularProgress from "@material-ui/core/CircularProgress";
+
 import { Event } from "../../models"
 import { GoogleMap, LoadScript, Marker, MarkerClusterer } from '@react-google-maps/api';
 import { httpClient } from "../../utils/asyncUtils";
@@ -14,9 +16,11 @@ const API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
 const GoogleMapChart: React.FC<Props> = ({mapSize}) => {
   const [allEvents, setAllEvents]: any = useState([]);
+  const [loading, setLoading] = useState(true);
   const getAllEvents = async (): Promise<Event[] | string | undefined> => {
     try {
       const { data } = await httpClient.get("http://localhost:3001/events/all");
+      setLoading(false)
       setAllEvents(data);
     } catch (error) {
       return error.message;
@@ -29,6 +33,9 @@ const GoogleMapChart: React.FC<Props> = ({mapSize}) => {
     return (
       <div>
         <h3>Events locations</h3>
+        {loading ? (
+          <CircularProgress />
+        ) : (
         <LoadScript
         googleMapsApiKey={API_KEY}
       >
@@ -49,6 +56,7 @@ const GoogleMapChart: React.FC<Props> = ({mapSize}) => {
           </>
         </GoogleMap>
       </LoadScript>
+      )}
       </div>
     )
 }

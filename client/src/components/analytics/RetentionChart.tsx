@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import CircularProgress from "@material-ui/core/CircularProgress";
 import { httpClient } from "../../utils/asyncUtils";
 import { Props } from "../../containers/DashBoard";
 import { weeklyRetentionObject } from "../../models"
@@ -7,13 +8,13 @@ import "./RetentionChart.css";
 
 const RetentionChart: React.FC<Props> = ({dayZero}) => {
     const [retentionData, setRetentionData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const fetchRetentionData = async ():  Promise<weeklyRetentionObject[] | string | undefined> => {
         try {
-            console.log(dayZero);
             const { data } = await httpClient.get
             (`http://localhost:3001/events/retention?dayZero=${dayZero}`);
-            console.log(data);
+            setLoading(false);
             setRetentionData(data);
         } catch (error) {
             return error.message;
@@ -27,6 +28,10 @@ const RetentionChart: React.FC<Props> = ({dayZero}) => {
 
     return (
         <div className="table-container" style={{width: '70%'}}>
+          {loading ? (
+                  <CircularProgress />
+
+          ) : (
   <Table responsive="sm" striped hover>
     <thead>
       <tr>
@@ -45,6 +50,7 @@ const RetentionChart: React.FC<Props> = ({dayZero}) => {
       )})}
     </tbody>
   </Table>
+  )}
         </div>
     )
 }
