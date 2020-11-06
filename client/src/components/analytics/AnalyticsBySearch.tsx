@@ -1,61 +1,69 @@
 import React, { useEffect, useState } from 'react'
 import { Props } from "../../containers/DashBoard";
 import { httpClient } from "../../utils/asyncUtils";
-import { Event } from "../../models"
+import { Event, EventComponentProps, UserColorProps } from "../../models"
 import SearchResultTicket from './SearchResultTicket';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import styled from "styled-components";
 
+
+
+// const Wrapper = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   overflow-y: scroll;
+//   overflow-x: hidden;
+//   width: 100%;
+// `;
 
 
 const AnalyticsBySearch: React.FC<Props> = ({allSearchProps}) => {
-    const [searchOptions, setSearchOptions] = useState(allSearchProps)
-    const [searchData, setSearchData] = useState([]);
-    const [infinityData, setInfinityData] = useState([]);
-    const [isThereMoreData, setIsThereMoreData] = useState(true)
-    // const [pageNumber, setPageNumber] = useState(1);
-    // const [loading, setLoading] = useState(true);
-    const [offset, setOffSet] = useState(10);
-    const fetchData = async (): Promise<Event[] | string | undefined> => {
+    const [searchData, setSearchData] = useState<Event[]>([]);
+    const [isThereMoreData, setIsThereMoreData] = useState<boolean>(true)
+    const [limit, setLimit] = useState<number>(10);
+    const fetchData = React.useCallback(async (filters, offset): Promise<Event[] | string | undefined> => {
         try {
             console.log(offset);
             const { data : eventData } = await httpClient.get
-            (`http://localhost:3001/events/all-filtered?browser=${allSearchProps.browser}&type=${allSearchProps.type}&sorting=${allSearchProps.sorting}&search=${allSearchProps.search}&offset=${offset}`);
-            setSearchData(eventData.events);
-            // setInfinityData(eventData.events.slice(0,10));
+            ("http://localhost:3001/events/all-filtered", {
+              params: {
+                ...filters  ,
+                offset ,
+              },
+            });
             console.log(eventData);
+            setSearchData(eventData.events);
+            setIsThereMoreData(eventData.more)
           } catch (error) {
             return error.message;
           }
-        }
-    // a fake async api call
-    const fetchMoreItems = () => {
-        setOffSet((prev) => prev + 10);
-        fetchData()
-        // setTimeout(() => {
-        //     setInfinityData(searchData.slice(0, offset))
-        // }, 1500);
-      }
-    
-    useEffect(() => {
-        fetchData();
-        // setOffSet(10);
+        }, [])
+    useEffect(() => { 
+      setSearchData([]);
+      setLimit(10);
+      fetchData(allSearchProps, 10); 
     }, [allSearchProps])
 
+
     return (
-        <div id="scrollableDiv" style={{width: 500}}>
+        <div id="scrollableDiv" >
           {searchData ? (
               <InfiniteScroll 
-              dataLength={100} //This is important field to render the next data
-                next={fetchMoreItems}
+              dataLength={searchData.length}
+                next={function () {
+                  fetchData(allSearchProps, limit + 10);
+                  setLimit((prev: number) => prev + 10);
+                }}
                 hasMore={isThereMoreData}
+                height={300}
+                scrollableTarget="scrollableDiv"
                 loader={<h3>Loading...</h3>}
-                scrollThreshold={0.8}
                 endMessage={
                   <p style={{ textAlign: 'center' }}>
                     <b>Yay! You have seen it all</b>
                   </p>
                 }
-                scrollableTarget="scrollableDiv"
+                
               > 
               {searchData.map((event: Event) =>
             <SearchResultTicket key={event._id}
@@ -64,10 +72,8 @@ const AnalyticsBySearch: React.FC<Props> = ({allSearchProps}) => {
               eventName={event.name} url={event.url} date={event.date}
             os={event.os} browser={event.browser} />
               )}
-            
              </InfiniteScroll>
           ): null}
-            
         </div>
     )
 }

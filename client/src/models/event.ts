@@ -43,3 +43,11 @@ export interface Filter {
   search?: string;
   offset?: number;
 }
+
+export interface EventComponentProps {
+  event: Event;
+}
+
+export interface UserColorProps {
+  userId: string;
+}

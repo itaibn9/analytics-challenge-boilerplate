@@ -11,7 +11,7 @@ import { httpClient } from "../../utils/asyncUtils";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: '30vw',
+      width: '20vw',
     },
     heading: {
       fontSize: theme.typography.pxToRem(15),

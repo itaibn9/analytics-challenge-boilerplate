@@ -52,7 +52,7 @@ const SearchBar: React.FC<Props> = () => {
     return (
       <>
         <h3>Search events by filters</h3>
-      <Grid container direction="row" justify="space-between" alignItems="stretch">
+      <Grid container direction="row" justify="center" >
           <Grid item className="Search_Inputs_container">
         <form className={classes.root} noValidate autoComplete="off">
       <TextField id="outlined-basic" label="Search" variant="outlined" onChange={(e: any) => {
