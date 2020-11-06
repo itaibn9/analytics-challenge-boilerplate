@@ -74,44 +74,32 @@ const DashBoard: React.FC = () => {
     <ErrorBoundary>
         <div>
           <ErrorBoundary>
-          {/* <div className="container" style={{gridArea: "Map"}}> */}
           <Grid item style={{marginTop:"100px", marginRight:"250px"}}>
          <GoogleMapChart mapSize={mapSize}/>
-        {/* </div> */}
         </Grid>
           </ErrorBoundary>
-          {/* <div className="container" style={{gridArea: "retentionChart"}}> */}
           <Grid item>
           <Grid container direction="row" justify="flex-start" >
           <Grid item>
           <ErrorBoundary>
           <SessionByDays chartSize={chartSize}/>
-          
-        {/* </div> */}
           </ErrorBoundary>
           </Grid>
           <Grid item>
           <ErrorBoundary>
-          {/* <div className="container" style={{gridArea: "byDayChart"}}> */}
-          
             <SessionByHour chartSize={chartSize}/>
-            {/* </div> */}
-        {/* </div> */}
         </ErrorBoundary>
         </Grid>
         </Grid>
             </Grid>
         <ErrorBoundary>
-            {/* <div className="container" style={{gridArea: "byHourChart"}}> */}
             <Grid item>
           <RetentionChorot />
           </Grid>
           </ErrorBoundary>
           <ErrorBoundary>
-          {/* <div className="container" style={{gridArea: "searchChart"}}> */}
           <Grid item >
           <SearchBar/>
-        {/* </div> */}
         </Grid>
         </ErrorBoundary>
           </div>
