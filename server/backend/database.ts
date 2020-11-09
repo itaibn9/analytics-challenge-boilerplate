@@ -283,12 +283,6 @@ export const getRetentionCohort = (dayZero: number):weeklyRetentionObject[]  => 
   const startWeek = moment(dayZero).startOf("day").valueOf();
   
  for (let begginingWeek = startWeek; begginingWeek <= Date.now(); begginingWeek += OneWeek) {
-  //  let UsersSignedUp = db.get(EVENT_TABLE).value().filter((event) => {
-  //    return event.name === "signup" &&
-  //     event.date >= begginingWeek &&
-  //     event.date <= begginingWeek + OneWeek;
-  //  });
-
   // All Signedup for this week
   let usersSignedUp = allSignups.filter(
     (event: Event) => 
@@ -305,11 +299,6 @@ export const getRetentionCohort = (dayZero: number):weeklyRetentionObject[]  => 
     weeklyRetentionArray.push(0);
    }
    for (let week = begginingWeek + OneWeek; week <= Date.now(); week+=OneWeek) {
-     //  let userInteraction = db.get(EVENT_TABLE).value().filter((event) => {
-       //    return event.name === "login" &&
-       //     event.date >= week &&
-       //      event.date <= week + OneWeek;
-       //  });
     let countUserSComeBack: number = 0;
     let userInteraction: Event[] = allLogins.filter(
       (event: Event) => 

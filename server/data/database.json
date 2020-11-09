@@ -18601,17 +18601,6 @@
       "balance": 75609,
       "createdAt": "2020-10-01T09:13:42.678Z",
       "modifiedAt": "2020-10-29T19:34:28.576Z"
-    },
-    {
-      "id": "BekKKLAyo",
-      "uuid": "b53be306-f663-4837-9dae-64fe457d3167",
-      "firstName": "tal",
-      "lastName": "haayt",
-      "username": "taltal",
-      "password": "$2a$10$2rfxzXpsgjTK9JFaVsRCGuNYogxlt6anrF6lfOA4e82EIBSLHgqbm",
-      "balance": 0,
-      "createdAt": "2020-11-06T12:39:44.423Z",
-      "modifiedAt": "2020-11-06T12:39:44.423Z"
     }
   ],
   "contacts": [
@@ -20366,17 +20355,6 @@
       "isDeleted": false,
       "createdAt": "2019-10-31T03:08:47.374Z",
       "modifiedAt": "2020-10-29T06:01:00.266Z"
-    },
-    {
-      "id": "hVYj-ZexR",
-      "uuid": "3cff81c2-15b5-45aa-acd7-320c0573cd04",
-      "userId": "BekKKLAyo",
-      "bankName": "pepper",
-      "accountNumber": "1111111111",
-      "routingNumber": "111111111",
-      "isDeleted": false,
-      "createdAt": "2020-11-06T12:40:04.168Z",
-      "modifiedAt": "2020-11-06T12:40:04.168Z"
     }
   ],
   "transactions": [
